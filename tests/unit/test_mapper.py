@@ -2,7 +2,7 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from scraper import Mapper
+from scraper.mapper import Mapper
 from scraper.navigation import NavigationHandler
 from scraper.navigation.dom_hasher import DOMHasher
 from scraper.network import NetworkInterceptor

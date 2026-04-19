@@ -3,7 +3,7 @@ import logging
 from typing import Any, Dict
 
 from config_loader import Config
-from scraper import Mapper
+from scraper.mapper import Mapper
 
 from .models import ScrapeRequest
 
