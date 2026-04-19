@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hosts-scraper-config
+  labels:
+    app: hosts-scraper
+data:
+  config.json: |
+    {
+      "start_url": "https://example.com",
+      "max_depth": 3,
+      "max_clicks_per_page": 20,
+      "wait_timeout": 30000,
+      "network_idle_timeout": 2000,
+      "http_credentials": {
+        "vault_path": "hosts-scraper/http",
+        "username_key": "username",
+        "password_key": "password"
+      },
+      "form_filling": {
+        "enabled": true,
+        "fill_delay": 100,
+        "defaults": {}
+      },
+      "exclude_patterns": ["logout", "delete", "remove", "login", "signin"],
+      "login": {
+        "login_url": "https://example.com/login",
+        "vault_path": "hosts-scraper/app",
+        "username_key": "app_username",
+        "password_key": "app_password",
+        "username_selector": "#username",
+        "password_selector": "input[type='password']",
+        "submit_selector": "button[type='submit']",
+        "post_login_wait_ms": 3000,
+        "storage_state_path": "/tmp/storage_state.json",
+        "reuse_storage_state": true
+      }
+    }

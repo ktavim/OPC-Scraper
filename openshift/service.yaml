@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hosts-scraper
+  labels:
+    app: hosts-scraper
+spec:
+  selector:
+    app: hosts-scraper
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
