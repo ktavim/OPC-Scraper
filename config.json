@@ -5,8 +5,8 @@
   "wait_timeout": 30000,
   "network_idle_timeout": 2000,
   "http_credentials": {
-    "username": "user",
-    "password": "pass"
+    "username_env": "HTTP_USERNAME",
+    "password_env": "HTTP_PASSWORD"
   },
   "form_filling": {
     "enabled": true,

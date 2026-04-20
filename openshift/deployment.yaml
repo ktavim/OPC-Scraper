@@ -27,14 +27,28 @@ spec:
               value: /etc/scraper/config.json
             - name: SCRAPER_MAX_PARALLEL
               value: "2"
-            - name: VAULT_ADDR
-              value: https://vault.vault.svc:8200
-            - name: VAULT_ROLE
-              value: hosts-scraper
-            - name: VAULT_K8S_MOUNT
-              value: kubernetes
-            - name: VAULT_KV_MOUNT
-              value: secret
+            # Credentials are sourced from the `hosts-scraper-credentials`
+            # Kubernetes Secret, which must exist in the same namespace.
+            - name: HTTP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: hosts-scraper-credentials
+                  key: http_username
+            - name: HTTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: hosts-scraper-credentials
+                  key: http_password
+            - name: APP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: hosts-scraper-credentials
+                  key: app_username
+            - name: APP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: hosts-scraper-credentials
+                  key: app_password
           volumeMounts:
             - name: config
               mountPath: /etc/scraper

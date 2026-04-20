@@ -2,4 +2,3 @@ playwright==1.58.*
 python-dotenv
 fastapi
 uvicorn[standard]
-hvac

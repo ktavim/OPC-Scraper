@@ -13,9 +13,8 @@ data:
       "wait_timeout": 30000,
       "network_idle_timeout": 2000,
       "http_credentials": {
-        "vault_path": "hosts-scraper/http",
-        "username_key": "username",
-        "password_key": "password"
+        "username_env": "HTTP_USERNAME",
+        "password_env": "HTTP_PASSWORD"
       },
       "form_filling": {
         "enabled": true,
@@ -25,9 +24,8 @@ data:
       "exclude_patterns": ["logout", "delete", "remove", "login", "signin"],
       "login": {
         "login_url": "https://example.com/login",
-        "vault_path": "hosts-scraper/app",
-        "username_key": "app_username",
-        "password_key": "app_password",
+        "username_env": "APP_USERNAME",
+        "password_env": "APP_PASSWORD",
         "username_selector": "#username",
         "password_selector": "input[type='password']",
         "submit_selector": "button[type='submit']",

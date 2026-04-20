@@ -5,14 +5,16 @@ from config_loader import load_config, Config, FormConfig, LoginConfig, _resolve
 
 
 class TestLoadConfig:
-    def test_load_valid_config(self, tmp_path):
+    def test_load_valid_config(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("HTTP_USER", "user")
+        monkeypatch.setenv("HTTP_PASS", "pass")
         config_data = {
             "start_url": "https://example.com",
             "max_depth": 5,
             "max_clicks_per_page": 30,
             "wait_timeout": 60000,
             "network_idle_timeout": 3000,
-            "http_credentials": {"username": "user", "password": "pass"},
+            "http_credentials": {"username_env": "HTTP_USER", "password_env": "HTTP_PASS"},
             "form_filling": {
                 "enabled": True,
                 "fill_delay": 200,
@@ -64,11 +66,13 @@ class TestLoadConfig:
         with pytest.raises(KeyError):
             load_config(str(config_file))
 
-    def test_load_config_with_credentials(self, tmp_path):
+    def test_load_config_with_credentials(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("HTTP_USER", "admin")
+        monkeypatch.setenv("HTTP_PASS", "secret")
         config_file = tmp_path / "config.json"
         config_file.write_text(json.dumps({
             "start_url": "https://example.com",
-            "http_credentials": {"username": "admin", "password": "secret"},
+            "http_credentials": {"username_env": "HTTP_USER", "password_env": "HTTP_PASS"},
         }))
 
         config = load_config(str(config_file))
@@ -172,7 +176,7 @@ class TestLoadConfig:
         }))
 
         config = load_config(str(config_file))
-        assert config.http_credentials == {}
+        assert config.http_credentials is None
 
     def test_output_file_override(self, tmp_path):
         config_file = tmp_path / "config.json"

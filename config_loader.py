@@ -3,8 +3,6 @@ import os
 from typing import Dict, Optional
 from dataclasses import dataclass
 
-from scraper.secrets import VaultError, get_default_client
-
 
 @dataclass
 class FormConfig:
@@ -50,18 +48,19 @@ class Config:
             self.exclude_patterns = ["logout", "delete", "remove", "login", "signin"]
 
 
-def _fetch_vault_pair(
-    vault_path: str,
-    username_key: str,
-    password_key: str,
-) -> tuple[str, str]:
-    client = get_default_client()
-    data = client.read_kv(vault_path)
-    if username_key not in data or password_key not in data:
-        raise VaultError(
-            f"Vault secret {vault_path} missing keys '{username_key}' and/or '{password_key}'"
+def _read_env_pair(block: dict) -> tuple[str, str]:
+    username_env = block.get('username_env')
+    password_env = block.get('password_env')
+    if not username_env or not password_env:
+        raise ValueError("block requires 'username_env' and 'password_env' keys")
+
+    username = os.environ.get(username_env)
+    password = os.environ.get(password_env)
+    if not username or not password:
+        raise ValueError(
+            f"env vars {username_env!r} and/or {password_env!r} are not set"
         )
-    return data[username_key], data[password_key]
+    return username, password
 
 
 def _resolve_http_credentials(data: dict) -> Optional[Dict[str, str]]:
@@ -69,19 +68,8 @@ def _resolve_http_credentials(data: dict) -> Optional[Dict[str, str]]:
     if not block:
         return None
 
-    vault_path = block.get('vault_path') or os.environ.get('VAULT_HTTP_CREDENTIALS_PATH')
-    if vault_path:
-        username, password = _fetch_vault_pair(
-            vault_path,
-            block.get('username_key', 'username'),
-            block.get('password_key', 'password'),
-        )
-        return {'username': username, 'password': password}
-
-    # Legacy plaintext (discouraged outside local dev)
-    if 'username' in block and 'password' in block:
-        return {'username': block['username'], 'password': block['password']}
-    raise ValueError("http_credentials must provide 'vault_path' or explicit username/password")
+    username, password = _read_env_pair(block)
+    return {'username': username, 'password': password}
 
 
 def _resolve_login(data: dict) -> Optional[LoginConfig]:
@@ -89,17 +77,7 @@ def _resolve_login(data: dict) -> Optional[LoginConfig]:
         return None
     block = data['login']
 
-    vault_path = block.get('vault_path') or os.environ.get('VAULT_LOGIN_PATH')
-    if not vault_path:
-        raise ValueError(
-            "login block requires 'vault_path' (or VAULT_LOGIN_PATH env) to resolve credentials"
-        )
-
-    username, password = _fetch_vault_pair(
-        vault_path,
-        block.get('username_key', 'app_username'),
-        block.get('password_key', 'app_password'),
-    )
+    username, password = _read_env_pair(block)
 
     if not block.get('login_url'):
         raise ValueError("login block requires 'login_url'")
