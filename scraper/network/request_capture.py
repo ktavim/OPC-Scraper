@@ -59,8 +59,8 @@ class RequestCapture:
             await self.interceptor.handle_response(request_data, response)
         except Exception as e:
             logger.error("Error handling response for %s: %s", url_key, e, exc_info=True)
-        finally:
             self.captured_urls.add(url_key)
+        finally:
             self.pending_requests.pop(url_key, None)
 
     async def _on_request_failed(self, request) -> None:
@@ -89,8 +89,8 @@ class RequestCapture:
         request_data = self.pending_requests.get(url_key) or await self.interceptor.handle_request(request)
 
         try:
-            response = request.response
-            if response and hasattr(response, 'status'):
+            response = await request.response()
+            if response is not None:
                 try:
                     await self.interceptor.handle_response(request_data, response)
                 except Exception as body_error:
