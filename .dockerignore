@@ -7,8 +7,6 @@ __pycache__/
 .gitignore
 .pytest_cache/
 .claude/
-tests/
 storage_state.json
-mappings_output.json
 *.log
 .env
